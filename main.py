@@ -22,14 +22,13 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Load models
 df = pickle.load(open('models/df1.pkl', 'rb'))
-tfidf_matrix = pickle.load(open('models/tfidf_matrix1.pkl', 'rb'))
+ 
 indices = pickle.load(open('models/indices1.pkl', 'rb'))
 indices = {k.lower(): v for k, v in indices.items()}
-embeddings = pickle.load(open('models/embeddings.pkl', 'rb'))
+ 
 vectors = pickle.load(open('models/vectors.pkl', 'rb'))
-similarity = cosine_similarity(vectors)
 
-embedding_similarity = cosine_similarity(embeddings)
+ 
 
 # Clean Genres
 def clean_genres(x):
@@ -138,20 +137,23 @@ def recommend(title, n=10):
     }
 
     # Get recommendations
-    sim_scores = list(enumerate(similarity[idx]))
-    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
-    sim_scores = sim_scores[1:n+1]
+    sim_scores = cosine_similarity(
+    vectors[idx],
+    vectors
+).flatten()
+
+    movie_indices = sim_scores.argsort()[::-1][1:n+1]
 
     results = []
-    for i in sim_scores:
-        movie_title = df.iloc[i[0]]['title']
+    for movie_idx in movie_indices:
+        movie_title = df.iloc[movie_idx]['title']
         movie_data = fetch_movie_data(movie_title)
         results.append({
             "title": movie_title,
             "poster": movie_data["poster"],
             "rating": movie_data["rating"],
             "year": movie_data["year"],
-            "genres": df.iloc[i[0]]['genres'][:2]  
+            "genres": df.iloc[movie_idx]['genres'][:2] 
         })
 
     return searched_movie, results
