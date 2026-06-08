@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Netflix Recommender</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<h1>🎬 Movie Recommender</h1>
+
+<div class="search-box">
+    <input type="text" id="search" placeholder="Search movie..." autocomplete="off">
+    <button onclick="submitSearch()">Search</button>
+    <div id="suggestions"></div>
+</div>
+
+<form id="form" method="post">
+    <input type="hidden" name="movie" id="hiddenInput">
+</form>
+
+{% if message %}
+    <div class="no-result" style="text-align: center; color: white; margin-top: 20px;">{{ message }}</div>
+{% endif %}
+
+
+{% if searched_movie %}
+<div class="hero-section" style="text-align: center; margin-top: 30px; margin-bottom: 50px;">
+    <h2 style="color: white; margin-bottom: 20px;">You Searched For</h2>
+    
+    <div class="card hero-card">
+        {% if searched_movie.poster %}
+            <img src="{{ searched_movie.poster }}" alt="{{ searched_movie.title }}">
+        {% else %}
+            <img src="/static/no-image.png" alt="No Image">
+        {% endif %}
+
+        <p>{{ searched_movie.title }}</p>
+
+        <small>
+            ⭐ {{ searched_movie.rating if searched_movie.rating != 0 else "N/A" }} | 
+            {{ searched_movie.year if searched_movie.year else "N/A" }}
+        </small>
+
+        <div class="genres">
+            {% for genre in searched_movie.genres %}
+                <span class="badge">{{ genre | capitalize }}</span>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
+{% if recommendations %}
+<div class="recommendations-section">
+    <h2 style="color: #e50914; text-align: center; margin-bottom: 30px;">
+        Movies Like {{ searched_movie.title }}
+    </h2>
+
+    <div class="grid">
+        {% for movie in recommendations %}
+        <div class="card" onclick="openDetails('{{ movie.title }}')">
+
+            {% if movie.poster %}
+                <img src="{{ movie.poster }}" alt="{{ movie.title }}">
+            {% else %}
+                <img src="/static/no-image.png" alt="No Image">
+            {% endif %}
+
+            <p>{{ movie.title }}</p>
+
+            <small>
+                ⭐ {{ movie.rating if movie.rating != 0 else "N/A" }} | 
+                {{ movie.year if movie.year else "N/A" }}
+            </small>
+
+            <div class="genres">
+                {% for genre in movie.genres %}
+                    <span class="badge">{{ genre | capitalize }}</span>
+                {% endfor %}
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<script>
+const search = document.getElementById("search");
+const suggestionsBox = document.getElementById("suggestions");
+
+// 🔍 Autocomplete
+search.addEventListener("input", async () => {
+    const query = search.value;
+
+    if (query.length < 2) {
+        suggestionsBox.innerHTML = "";
+        return;
+    }
+
+    try {
+        const res = await fetch(`/suggest?query=${query}`);
+        const data = await res.json();
+
+        suggestionsBox.innerHTML = data.map(item =>
+            `<div onclick="selectMovie('${item}')">${item}</div>`
+        ).join("");
+
+    } catch (error) {
+        console.log("Error:", error);
+    }
+});
+
+// select movie
+function selectMovie(title) {
+    document.getElementById("hiddenInput").value = title;
+    document.getElementById("form").submit();
+}
+
+// button search
+function submitSearch() {
+    const value = search.value.trim();
+    if (value !== "") {
+        selectMovie(value);
+    }
+}
+
+// open details page
+function openDetails(title) {
+    window.location.href = `/movie/${title}`;
+}
+</script>
+
+</body>
+</html>
