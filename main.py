@@ -12,6 +12,9 @@ from difflib import get_close_matches
 API_KEY = "5eded495b89930740bc85bf61f7d1497"
 
 app = FastAPI()
+@app.get("/abhijeet")
+def abhijeet():
+    return {"message": "hello"}
 
 # ==========================================
 # SETUP & DATA LOADING
