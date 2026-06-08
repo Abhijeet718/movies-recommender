@@ -163,16 +163,8 @@ def recommend(title, n=10):
 # ==========================================
 
 @app.get("/")
-def home(request: Request):
-    return templates.TemplateResponse(
-        "index.html",
-        {
-            "request": request,
-            "searched_movie": None,
-            "recommendations": [],
-            "message": ""
-        }
-    )
+def home():
+    return {"status": "working"}
 
 @app.post("/")
 def get_recommendations(request: Request, movie: str = Form(...)):
