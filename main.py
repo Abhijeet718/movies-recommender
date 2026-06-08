@@ -165,13 +165,12 @@ def recommend(title, n=10):
 @app.get("/")
 def home(request: Request):
     return templates.TemplateResponse(
-        request,
         "index.html",
         {
             "request": request,
-            "searched_movie": None,     
-            "recommendations": [],      
-            "message": ""   
+            "searched_movie": None,
+            "recommendations": [],
+            "message": ""
         }
     )
 
@@ -184,7 +183,7 @@ def get_recommendations(request: Request, movie: str = Form(...)):
         message = "❌ Movie not found. Try another name."
 
     return templates.TemplateResponse(
-        request,
+        
         "index.html",
         {
             "request": request,
@@ -204,7 +203,7 @@ def movie_detail(request: Request, title: str):
     movie_data = fetch_full_movie_details(title)
 
     return templates.TemplateResponse(
-        request,       # 👈 ADD THIS HERE
+              # 👈 ADD THIS HERE
         "movie.html",
         {"request": request, "title": title, "movie": movie_data}
     )
