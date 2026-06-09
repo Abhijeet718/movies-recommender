@@ -10,11 +10,9 @@ from sklearn.metrics.pairwise import cosine_similarity
 from difflib import get_close_matches
 
 API_KEY = "5eded495b89930740bc85bf61f7d1497"
-
 app = FastAPI()
-@app.get("/abhijeet")
-def abhijeet():
-    return {"message": "hello"}
+ 
+ 
 
 # ==========================================
 # SETUP & DATA LOADING
@@ -164,10 +162,19 @@ def recommend(title, n=10):
 # ==========================================
 # FASTAPI ROUTES
 # ==========================================
-
+ 
 @app.get("/")
-def home():
-    return {"status": "working"}
+def home(request: Request):
+    return templates.TemplateResponse(
+        request,
+        "index.html",
+        {
+            "request": request,
+            "searched_movie": None,
+            "recommendations": [],
+            "message": ""
+        }
+    )
 
 @app.post("/")
 def get_recommendations(request: Request, movie: str = Form(...)):
@@ -178,7 +185,7 @@ def get_recommendations(request: Request, movie: str = Form(...)):
         message = "❌ Movie not found. Try another name."
 
     return templates.TemplateResponse(
-        
+        request,
         "index.html",
         {
             "request": request,
@@ -198,7 +205,7 @@ def movie_detail(request: Request, title: str):
     movie_data = fetch_full_movie_details(title)
 
     return templates.TemplateResponse(
-              # 👈 ADD THIS HERE
+        request,      # 👈 ADD THIS HERE
         "movie.html",
         {"request": request, "title": title, "movie": movie_data}
     )
