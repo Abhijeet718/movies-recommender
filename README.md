@@ -4,8 +4,6 @@ A content-based Movie Recommendation System built using FastAPI, Scikit-learn, a
 
 ## 🚀 Live Demo
 
-## 🚀 Live Demo
-
 [Open Live Demo]( https://movies-recommender-6y1k.onrender.com)
 
 ## 📌 Features
